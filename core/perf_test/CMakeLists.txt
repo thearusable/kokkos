@@ -139,7 +139,7 @@ IF(NOT Kokkos_ENABLE_OPENMPTARGET)
 ENDIF()
 
 KOKKOS_ADD_EXECUTABLE_AND_TEST(
-  PerformanceTest_SampleBenchmark
-  SOURCES BenchmarkMain.cpp Benchmark_Sample.cpp
+  PerformanceTest_Benchmark
+  SOURCES BenchmarkMain.cpp Benchmark_ViewCopy.cpp
   CATEGORIES PERFORMANCE
 )
