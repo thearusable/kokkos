@@ -15,30 +15,6 @@ IF ((KOKKOS_ENABLE_OPENMPTARGET OR KOKKOS_ENABLE_OPENACC) AND KOKKOS_CXX_COMPILE
   RETURN()
 ENDIF()
 
-find_package(benchmark QUIET)
-IF(NOT benchmark_FOUND)
-  message(STATUS "No installed benchmark found, fetching from GitHub")
-  include(FetchContent)
-  SET(BENCHMARK_ENABLE_TESTING OFF)
-
-  FetchContent_Declare(
-        googlebenchmark
-        GIT_REPOSITORY https://github.com/google/benchmark.git
-        GIT_TAG v1.6.2)
-
-  FetchContent_MakeAvailable(
-        googlebenchmark)
-
-  include_directories(${benchmark_SOURCE_DIR}/include)
-
-  # Suppress clang-tidy diagnostics on code that we do not have control over
-  IF(CMAKE_CXX_CLANG_TIDY)
-    SET_TARGET_PROPERTIES(benchmark PROPERTIES CXX_CLANG_TIDY "")
-  ENDIF()
-
-  target_compile_options(benchmark PRIVATE -w)
-  target_compile_options(benchmark_main PRIVATE -w)
-ENDIF()
 
 SET(SOURCES
   PerfTestMain.cpp
