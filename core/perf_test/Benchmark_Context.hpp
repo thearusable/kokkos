@@ -53,10 +53,33 @@
 
 namespace Test {
 
-void add_benchmark_context(bool verbose = false) {
+std::string remove_unwanted_prefix(std::string str) {
+  auto found = str.find_first_not_of(" :,");
+  if(found != std::string::npos) {
+    return str.substr(found);
+  }
+  return str;
+}
+
+void add_kokkos_configuration(bool verbose = false) {
   std::ostringstream msg;
   Kokkos::print_configuration(msg, verbose);
-  benchmark::AddCustomContext("Kokkos configuration", msg.str());
+
+  std::stringstream ss{msg.str()};
+  for(std::string line; std::getline(ss, line, '\n');) {
+    auto found = line.find_first_of(':');
+    if(found != std::string::npos){
+      auto val = remove_unwanted_prefix(line.substr(found + 1));
+      if(val.length()) {
+        benchmark::AddCustomContext(remove_unwanted_prefix(line.substr(0, found)), val);
+      }
+    }
+  }
+}
+
+void add_benchmark_context(bool verbose = false) {
+  // Add Kokkos configuration to benchmark context data
+  add_kokkos_configuration(verbose);
 }
 
 }  // namespace Test
