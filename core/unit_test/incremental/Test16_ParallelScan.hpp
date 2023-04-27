@@ -94,11 +94,11 @@ struct TestScan {
 
 // Temporary: This condition will progressively be reduced when parallel_scan
 // with return value will be implemented for more backends.
-#if defined(KOKKOS_ENABLE_SERIAL) && !defined(KOKKOS_ENABLE_CUDA) &&          \
-    !defined(KOKKOS_ENABLE_HIP) && !defined(KOKKOS_ENABLE_OPENACC) &&         \
-    !defined(KOKKOS_ENABLE_SYCL) && !defined(KOKKOS_ENABLE_THREADS) &&        \
-    !defined(KOKKOS_ENABLE_OPENMP) && !defined(KOKKOS_ENABLE_OPENMPTARGET) && \
-    !defined(KOKKOS_ENABLE_HPX)
+#if defined(KOKKOS_ENABLE_SERIAL) && !defined(KOKKOS_ENABLE_CUDA) &&           \
+    !defined(KOKKOS_ENABLE_HIP) && !defined(KOKKOS_ENABLE_OPENACC) &&          \
+    !defined(KOKKOS_ENABLE_SYCL) && !defined(Kokkos_ENABLE_OPENMP) &&          \
+    !defined(Kokkos_ENABLE_THREADS) && !defined(Kokkos_ENABLE_OPENMPTARGET) && \
+    !defined(Kokkos_ENABLE_HPX)
   template <typename FunctorType>
   void parallel_scan_retval() {
     View_1D d_data("data", N);
@@ -258,11 +258,11 @@ TEST(TEST_CATEGORY, IncrTest_16_parallelscan) {
 
 // Temporary: This condition will progressively be reduced when parallel_scan
 // with return value will be implemented for more backends.
-#if defined(KOKKOS_ENABLE_SERIAL) && !defined(KOKKOS_ENABLE_CUDA) &&          \
-    !defined(KOKKOS_ENABLE_HIP) && !defined(KOKKOS_ENABLE_OPENACC) &&         \
-    !defined(KOKKOS_ENABLE_SYCL) && !defined(KOKKOS_ENABLE_THREADS) &&        \
-    !defined(KOKKOS_ENABLE_OPENMP) && !defined(KOKKOS_ENABLE_OPENMPTARGET) && \
-    !defined(KOKKOS_ENABLE_HPX)
+#if defined(KOKKOS_ENABLE_SERIAL) && !defined(KOKKOS_ENABLE_CUDA) &&           \
+    !defined(KOKKOS_ENABLE_HIP) && !defined(KOKKOS_ENABLE_OPENACC) &&          \
+    !defined(KOKKOS_ENABLE_SYCL) && !defined(Kokkos_ENABLE_OPENMP) &&          \
+    !defined(Kokkos_ENABLE_THREADS) && !defined(Kokkos_ENABLE_OPENMPTARGET) && \
+    !defined(Kokkos_ENABLE_HPX)
 TEST(TEST_CATEGORY, IncrTest_16_parallelscan_retval) {
   TestScan<TEST_EXECSPACE> test;
   test.parallel_scan_retval<TrivialScanFunctor<TEST_EXECSPACE>>();
