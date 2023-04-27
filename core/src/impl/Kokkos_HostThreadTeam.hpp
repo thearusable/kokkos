@@ -892,6 +892,31 @@ KOKKOS_INLINE_FUNCTION
   }
 }
 
+template <
+    typename iType, class Closure, class Member,
+    class ValueType = typename Kokkos::Impl::FunctorAnalysis<
+        Kokkos::Impl::FunctorPatternInterface::SCAN, void, Closure>::value_type>
+KOKKOS_INLINE_FUNCTION
+    std::enable_if_t<!Kokkos::is_reducer<ValueType>::value &&
+                     Impl::is_host_thread_team_member<Member>::value>
+    parallel_scan(Impl::TeamThreadRangeBoundariesStruct<iType, Member> const&
+                      loop_boundaries,
+                  Closure const& closure, ValueType& return_val) {
+  // Intra-member scan
+  for (iType i = loop_boundaries.start; i < loop_boundaries.end;
+       i += loop_boundaries.increment) {
+    closure(i, return_val, false);
+  }
+
+  // 'return_val' output is the exclusive prefix sum
+  return_val = loop_boundaries.thread.team_scan(return_val);
+
+  for (iType i = loop_boundaries.start; i < loop_boundaries.end;
+       i += loop_boundaries.increment) {
+    closure(i, return_val, true);
+  }
+}
+
 template <typename iType, class ClosureType, class Member>
 KOKKOS_INLINE_FUNCTION
     std::enable_if_t<Impl::is_host_thread_team_member<Member>::value>
@@ -909,6 +934,25 @@ KOKKOS_INLINE_FUNCTION
   for (iType i = loop_boundaries.start; i < loop_boundaries.end;
        i += loop_boundaries.increment) {
     closure(i, scan_val, true);
+  }
+}
+
+template <
+    typename iType, class ClosureType, class Member,
+    class ValueType = typename Kokkos::Impl::FunctorAnalysis<
+        Impl::FunctorPatternInterface::SCAN, void, ClosureType>::value_type>
+KOKKOS_INLINE_FUNCTION
+    std::enable_if_t<!Kokkos::is_reducer<ValueType>::value &&
+                     Impl::is_host_thread_team_member<Member>::value>
+    parallel_scan(Impl::ThreadVectorRangeBoundariesStruct<iType, Member> const&
+                      loop_boundaries,
+                  ClosureType const& closure, ValueType& return_val) {
+#ifdef KOKKOS_ENABLE_PRAGMA_IVDEP
+#pragma ivdep
+#endif
+  for (iType i = loop_boundaries.start; i < loop_boundaries.end;
+       i += loop_boundaries.increment) {
+    closure(i, return_val, true);
   }
 }
 
