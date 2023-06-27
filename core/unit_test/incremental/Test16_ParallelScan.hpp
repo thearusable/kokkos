@@ -108,10 +108,10 @@ struct TestScan {
 // Temporary: This condition will progressively be reduced when parallel_scan
 // with return value will be implemented for more backends.
 #if defined(KOKKOS_ENABLE_SERIAL) || defined(KOKKOS_ENABLE_OPENMP) || \
-    defined(KOKKOS_ENABLE_CUDA)
-#if !defined(KOKKOS_ENABLE_HIP) && !defined(KOKKOS_ENABLE_OPENACC) &&  \
-    !defined(KOKKOS_ENABLE_SYCL) && !defined(KOKKOS_ENABLE_THREADS) && \
-    !defined(KOKKOS_ENABLE_OPENMPTARGET) && !defined(KOKKOS_ENABLE_HPX)
+    defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
+#if !defined(KOKKOS_ENABLE_OPENACC) && !defined(KOKKOS_ENABLE_SYCL) &&         \
+    !defined(KOKKOS_ENABLE_THREADS) && !defined(KOKKOS_ENABLE_OPENMPTARGET) && \
+    !defined(KOKKOS_ENABLE_HPX)
   template <typename FunctorType>
   void parallel_scan_retval() {
     View_1D d_data("data", N);
@@ -318,10 +318,10 @@ TEST(TEST_CATEGORY, IncrTest_16_parallelscan) {
 // Temporary: This condition will progressively be reduced when parallel_scan
 // with return value will be implemented for more backends.
 #if defined(KOKKOS_ENABLE_SERIAL) || defined(KOKKOS_ENABLE_OPENMP) || \
-    defined(KOKKOS_ENABLE_CUDA)
-#if !defined(KOKKOS_ENABLE_HIP) && !defined(KOKKOS_ENABLE_OPENACC) &&  \
-    !defined(KOKKOS_ENABLE_SYCL) && !defined(KOKKOS_ENABLE_THREADS) && \
-    !defined(KOKKOS_ENABLE_OPENMPTARGET) && !defined(KOKKOS_ENABLE_HPX)
+    defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
+#if !defined(KOKKOS_ENABLE_OPENACC) && !defined(KOKKOS_ENABLE_SYCL) &&         \
+    !defined(KOKKOS_ENABLE_THREADS) && !defined(KOKKOS_ENABLE_OPENMPTARGET) && \
+    !defined(KOKKOS_ENABLE_HPX)
 TEST(TEST_CATEGORY, IncrTest_16_parallelscan_retval) {
   TestScan<TEST_EXECSPACE> test;
   test.parallel_scan_retval<TrivialScanFunctor<TEST_EXECSPACE>>();
@@ -339,16 +339,16 @@ TEST(TEST_CATEGORY, IncrTest_16_parallelscan_retval_team_thread_range) {
 // Constructor/Destructor of NonTrivialScanFunctor is not device-callable. This
 // will produce a compilation warning when trying to use __host__ function from
 // __host__ __device__ function.
-#if defined(KOKKOS_ENABLE_CUDA)
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
 #else
   test.parallel_scan_retval_team_thread_range<
       NonTrivialScanFunctor<TEST_EXECSPACE>>();
 #endif
 }
 
-// CUDA backend doesn't have parallel_scan which accepts
+// CUDA and HIP backend doesn't have parallel_scan which accepts
 // TeamVectorRangeBoundariesStruct
-#if defined(KOKKOS_ENABLE_CUDA)
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
 #else
 TEST(TEST_CATEGORY, IncrTest_16_parallelscan_retval_team_vector_range) {
   TestScan<TEST_EXECSPACE> test;
@@ -371,7 +371,7 @@ TEST(TEST_CATEGORY, IncrTest_16_parallelscan_retval_thread_vector_range) {
 // Constructor/Destructor of NonTrivialScanFunctor is not device-callable. This
 // will produce a compilation warning when trying to use __host__ function from
 // __host__ __device__ function.
-#if defined(KOKKOS_ENABLE_CUDA)
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
 #else
   test.parallel_scan_retval_thread_vector_range<
       NonTrivialScanFunctor<TEST_EXECSPACE>>();
