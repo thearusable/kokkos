@@ -689,14 +689,18 @@ parallel_reduce(Impl::ThreadVectorRangeBoundariesStruct<
  *  final == true.
  */
 // This is the same code as in HIP and largely the same as in OpenMPTarget
-template <typename iType, typename FunctorType,
-          class ValueType = typename Kokkos::Impl::FunctorAnalysis<
-              Kokkos::Impl::FunctorPatternInterface::SCAN, void, FunctorType,
-              void>::value_type>
+template <typename iType, typename FunctorType, typename ValueType>
 KOKKOS_INLINE_FUNCTION void parallel_scan(
     const Impl::TeamThreadRangeBoundariesStruct<iType, Impl::CudaTeamMember>&
         loop_bounds,
     const FunctorType& lambda, ValueType& accum) {
+  // Extract ValueType from the Functor
+  using FunctorValueType = typename Kokkos::Impl::FunctorAnalysis<
+      Kokkos::Impl::FunctorPatternInterface::SCAN, void, FunctorType,
+      ValueType>::value_type;
+  static_assert(std::is_same<FunctorValueType, ValueType>::value,
+                "Non-matching value types of functor and return type");
+
   const auto start     = loop_bounds.start;
   const auto end       = loop_bounds.end;
   auto& member         = loop_bounds.member;
@@ -737,7 +741,7 @@ KOKKOS_INLINE_FUNCTION void parallel_scan(
     const Impl::TeamThreadRangeBoundariesStruct<iType, Impl::CudaTeamMember>&
         loop_bounds,
     const FunctorType& lambda) {
-  // Extract ValueType from lambda
+  // Extract ValueType from functor
   using ValueType = typename Kokkos::Impl::FunctorAnalysis<
       Kokkos::Impl::FunctorPatternInterface::SCAN, void, FunctorType,
       void>::value_type;
@@ -867,14 +871,18 @@ KOKKOS_INLINE_FUNCTION void parallel_scan(
  *  thread and a scan operation is performed.
  *  The last call to closure has final == true.
  */
-template <typename iType, class Closure,
-          class ValueType = typename Kokkos::Impl::FunctorAnalysis<
-              Kokkos::Impl::FunctorPatternInterface::SCAN, void, Closure,
-              void>::value_type>
+template <typename iType, class Closure, typename ValueType>
 KOKKOS_INLINE_FUNCTION void parallel_scan(
     const Impl::ThreadVectorRangeBoundariesStruct<iType, Impl::CudaTeamMember>&
         loop_boundaries,
     const Closure& closure, ValueType& return_val) {
+  // Extract ValueType from the Closure
+  using ClosureValueType = typename Kokkos::Impl::FunctorAnalysis<
+      Kokkos::Impl::FunctorPatternInterface::SCAN, void, Closure,
+      ValueType>::value_type;
+  static_assert(std::is_same<ClosureValueType, ValueType>::value,
+                "Non-matching value types of closure and return type");
+
   parallel_scan(loop_boundaries, closure, Kokkos::Sum<ValueType>(return_val));
 }
 
